@@ -1,7 +1,7 @@
 <template>
   <div class="pietjesbak__step-button__wrap">
     <div
-      v-if="this.uwBeurt"
+      v-if="this.aanDeBeurt.naam === this.player"
       class="button button--prim pietjesbak__step-button"
       v-bind:class="{ 'button--inactive': this.rondeWorpen.waarde === 0 }"
       v-on:click="nextButton"
@@ -22,11 +22,7 @@
 //met een v-if bij dobbelsteen div en de cijfers in store zetten
 export default {
   name: "Next",
-  props: [
-    "socket",
-    "gameData",
-    "lobbySpelers"
-  ],
+  props: ["socket", "gameData", "lobbySpelers"],
   data() {
     return {
       player: "",
@@ -49,17 +45,11 @@ export default {
       laagste: {},
       spelers: {},
       gesmetenSpelers: [],
-      uwBeurt: false
+      aanDeBeurt: {
+        naam: ""
+      }
     };
   },
-  // data() {
-  //   return {
-  //     worp: 0,
-  //     punten: 0
-  //   };
-  // },
-  // computed: {
-  // },
   created() {
     this.dobbels = this.gameData.dobbels;
     this.adkDobbels = this.gameData.adkDobbels;
@@ -67,10 +57,10 @@ export default {
     this.rondeWorpen = this.gameData.rondeWorpen;
     this.actionBusy = this.gameData.actionBusy;
     this.gameStarted = this.gameData.gameStarted;
-    this.hoogste = this.gameData.hoogste
-    this.laagste = this.gameData.laagste
-    this.spelers = this.gameData.users
-    this.gesmetenSpelers = this.gameData.gesmetenSpelers
+    this.hoogste = this.gameData.hoogste;
+    this.laagste = this.gameData.laagste;
+    this.spelers = this.gameData.users;
+    this.gesmetenSpelers = this.gameData.gesmetenSpelers;
   },
   mounted() {
     this.player = this.$route.params.userName;
@@ -82,28 +72,21 @@ export default {
       this.rondeWorpen = data.gameData.rondeWorpen;
       this.actionBusy = data.gameData.actionBusy;
       this.gameStarted = data.gameData.gameStarted;
-      this.hoogste = data.gameData.hoogste
-      this.laagste = data.gameData.laagste
-      this.spelers = data.gameData.users
-      this.gesmetenSpelers = data.gameData.gesmetenSpelers
-      this.uwBeurt = this.isPlayerActive(this.spelers);
+      this.hoogste = data.gameData.hoogste;
+      this.laagste = data.gameData.laagste;
+      this.spelers = data.gameData.users;
+      this.gesmetenSpelers = data.gameData.gesmetenSpelers;
+      this.checkActivePlayer();
     });
   },
-  computed: {
-  },
+  computed: {},
   methods: {
-    isPlayerActive(spelers) {
-      let bool = spelers.forEach(speler => {
-        console.log(speler.active);
-        
-        if(speler.active && speler.username === this.$route.params.userName) {
-          return true;
-        } else {
-          return false;
+    checkActivePlayer() {
+      this.spelers.forEach(speler => {
+        if (speler.active === true) {
+          this.aanDeBeurt.naam = speler.username;
         }
       });
-      
-      return bool
     },
     nextButton() {
       if (this.rondeWorpen.waarde === 0) {
@@ -126,18 +109,21 @@ export default {
         this.resetRondeWorpen();
       }
 
-      this.spelers.forEach(speler => {
-        // if (speler.punten !== 0) {
-          
-          if (!this.gesmetenSpelers.includes(speler.username)) {
-            this.addGesmetenSpelers(speler.username);
+      // this.spelers.forEach(speler => {
+      //   if (speler.punten !== 0 && speler.username === this.player) {
+          if (!this.gesmetenSpelers.includes(this.player)) {
+            this.addGesmetenSpelers(this.player);
+            console.log("nog eens:", this.gesmetenSpelers);
+            
           }
         // }
-      });
+      // });
 
       this.completeStats();
 
-      if (this.gesmetenSpelers.length === this.spelers.length) {
+      console.log(this.gesmetenSpelers);
+      
+      if (this.gesmetenSpelers.length === (this.spelers.length - 1)) {
         this.deselectAllPlayers();
       } else {
         this.selectNextPlayer();
@@ -146,7 +132,10 @@ export default {
       this.resetAllDobbels();
     },
     addGesmetenSpelers(naam) {
-      this.socket.emit("addGesmetenSpelers", ({room:this.lobbyId, naam:naam}));
+      this.socket.emit("addGesmetenSpelers", {
+        room: this.lobbyId,
+        naam: naam
+      });
     },
     addMaxWorpen() {
       this.socket.emit("addMaxWorpen", this.lobbyId);
@@ -176,7 +165,7 @@ export default {
       this.socket.emit("deselectAllPlayers", this.lobbyId);
     },
     resetDobbel(steen) {
-      this.socket.emit("resetDobbel", ({room:this.lobbyId, steen:steen}));
+      this.socket.emit("resetDobbel", { room: this.lobbyId, steen: steen });
     },
     resetAllDobbels() {
       if (this.adkDobbels.adkDobbel1 !== 0) {

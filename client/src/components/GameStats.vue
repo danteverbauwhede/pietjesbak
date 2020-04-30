@@ -31,33 +31,29 @@
 <script>
 export default {
   name: "GameStats",
-  props: [
-    "socket",
-    "gameData",
-    "lobbySpelers"
-  ],
+  props: ["socket", "gameData", "lobbySpelers"],
   data() {
     return {
       maxAantalWorpen: {},
       hoogste: {},
       laagste: {},
-      spelers: {},
-    }
+      spelers: {}
+    };
   },
   created() {
     this.maxAantalWorpen = this.gameData.maxAantalWorpen;
-    this.hoogste = this.gameData.hoogste
-    this.laagste = this.gameData.laagste
-    this.spelers = this.gameData.users
+    this.hoogste = this.gameData.hoogste;
+    this.laagste = this.gameData.laagste;
+    this.spelers = this.gameData.users;
   },
   mounted() {
     this.socket.on("lobbyData", data => {
       this.maxAantalWorpen = data.gameData.maxAantalWorpen;
-      this.hoogste = data.gameData.hoogste
-      this.laagste = data.gameData.laagste
-      this.spelers = data.gameData.users
+      this.hoogste = data.gameData.hoogste;
+      this.laagste = data.gameData.laagste;
+      this.spelers = data.gameData.users;
     });
-  },
+  }
 };
 </script>
 

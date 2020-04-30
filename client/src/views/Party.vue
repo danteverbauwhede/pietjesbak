@@ -91,7 +91,7 @@ export default {
     this.socket.on("lobbyData", data => {
       this.lobbySpelers = data.users;
       this.gameData = data.gameData;
-      
+
       data.users.forEach(user => {
         if (user.admin) {
           this.admin = user.userId;

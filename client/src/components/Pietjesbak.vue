@@ -1,21 +1,31 @@
 <template>
   <div class="width main">
-    <Lobby v-bind:socket="this.socket"
-        v-bind:gameData="this.gameData"
-        v-bind:lobbySpelers="this.lobbySpelers" />
+    <Lobby
+      v-bind:socket="this.socket"
+      v-bind:gameData="this.gameData"
+      v-bind:lobbySpelers="this.lobbySpelers"
+    />
     <div class="gameview__wrap pietjesbak">
-      <Dobbelstenen v-bind:socket="this.socket"
+      <Dobbelstenen
+        v-bind:socket="this.socket"
         v-bind:gameData="this.gameData"
-        v-bind:lobbySpelers="this.lobbySpelers" />
-      <Next v-bind:socket="this.socket"
+        v-bind:lobbySpelers="this.lobbySpelers"
+      />
+      <Next
+        v-bind:socket="this.socket"
         v-bind:gameData="this.gameData"
-        v-bind:lobbySpelers="this.lobbySpelers" />
-      <GameStats v-bind:socket="this.socket"
+        v-bind:lobbySpelers="this.lobbySpelers"
+      />
+      <GameStats
+        v-bind:socket="this.socket"
         v-bind:gameData="this.gameData"
-        v-bind:lobbySpelers="this.lobbySpelers" />
-      <VolgendeRonde v-bind:socket="this.socket"
+        v-bind:lobbySpelers="this.lobbySpelers"
+      />
+      <VolgendeRonde
+        v-bind:socket="this.socket"
         v-bind:gameData="this.gameData"
-        v-bind:lobbySpelers="this.lobbySpelers" />
+        v-bind:lobbySpelers="this.lobbySpelers"
+      />
     </div>
   </div>
 </template>
@@ -37,7 +47,7 @@ export default {
     return {
       lobbyId: "",
       spelers: []
-    }
+    };
   },
   components: {
     Dobbelstenen,
@@ -47,9 +57,7 @@ export default {
     Lobby
   },
   created() {
-    this.socket.on("connect", () => {
-
-    });
+    this.socket.on("connect", () => {});
   },
   mounted() {
     this.socket.on("lobbyData", data => {
@@ -62,6 +70,6 @@ export default {
       this.lobbyId = this.$route.params.lobbyId;
       this.socket.emit("mountPietjesbak", this.lobbyId);
     }
-  },
+  }
 };
 </script>

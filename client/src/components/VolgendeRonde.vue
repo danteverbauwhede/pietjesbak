@@ -1,11 +1,19 @@
 <template>
   <div class="">
     <div
+      v-if="this.isPlayerAdmin"
       class="button button--sec"
-      v-bind:class="{ 'button--inactive': !this.iedereenGesmeten}"
+      v-bind:class="{ 'hidden': !this.iedereenGesmeten }"
       v-on:click="volgendeRonde"
     >
       Volgende Ronde
+    </div>
+    <div
+      v-else
+      class="button button--sec button--inactive"
+      v-bind:class="{ 'hidden': !this.iedereenGesmeten }"
+    >
+      Waiting for admin
     </div>
   </div>
 </template>
@@ -14,11 +22,7 @@
 //met een v-if bij dobbelsteen div en de cijfers in store zetten
 export default {
   name: "VolgendeRonde",
-  props: [
-    "socket",
-    "gameData",
-    "lobbySpelers"
-  ],
+  props: ["socket", "gameData", "lobbySpelers"],
   data() {
     return {
       maxAantalWorpen: {},
@@ -29,30 +33,35 @@ export default {
       gesmetenSpelers: [],
       lobbyId: "",
       admin: ""
-    }
+    };
   },
   created() {
     this.maxAantalWorpen = this.gameData.maxAantalWorpen;
-    this.hoogste = this.gameData.hoogste
-    this.laagste = this.gameData.laagste
-    this.spelers = this.gameData.users
-    this.adkDobbels = this.gameData.adkDobbels
-    this.gesmetenSpelers = this.gameData.gesmetenSpelers
+    this.hoogste = this.gameData.hoogste;
+    this.laagste = this.gameData.laagste;
+    this.spelers = this.gameData.users;
+    this.adkDobbels = this.gameData.adkDobbels;
+    this.gesmetenSpelers = this.gameData.gesmetenSpelers;
   },
   mounted() {
     this.lobbyId = this.$route.params.lobbyId;
     this.socket.on("lobbyData", data => {
       this.maxAantalWorpen = data.gameData.maxAantalWorpen;
-      this.hoogste = data.gameData.hoogste
-      this.laagste = data.gameData.laagste
-      this.spelers = data.gameData.users
-      this.adkDobbels = data.gameData.adkDobbels
-      this.gesmetenSpelers = data.gameData.gesmetenSpelers
+      this.hoogste = data.gameData.hoogste;
+      this.laagste = data.gameData.laagste;
+      this.spelers = data.gameData.users;
+      this.adkDobbels = data.gameData.adkDobbels;
+      this.gesmetenSpelers = data.gameData.gesmetenSpelers;
+      data.gameData.users.forEach(user => {
+        if (user.admin) {
+          this.admin = user.userId;
+        }
+      });
     });
-    console.log(this.spelers);
   },
   computed: {
     iedereenGesmeten: function() {
+      console.log(this.gesmetenSpelers, this.spelers.length);
       if (this.gesmetenSpelers.length === this.spelers.length) {
         return true;
       } else {
@@ -60,31 +69,31 @@ export default {
       }
     },
     isPlayerAdmin: function() {
-      const bool = this.spelers.forEach(speler => {
-        if(speler.admin & speler.username === this.$route.params.userName) {
+      let bool = false;
+      this.spelers.forEach(speler => {
+        if (speler.admin & (speler.username === this.$route.params.userName)) {
           if (this.gesmetenSpelers.length === this.spelers.length) {
-            return true;
+            bool = true;
           } else {
-            return false;
+            bool = false;
           }
         }
       });
 
-      return bool
+      return bool;
     }
   },
   methods: {
     volgendeRonde() {
       if (!this.iedereenGesmeten) {
         let str = "";
-        let moet = "moet";
+        let moet = " moet";
         this.spelers.forEach(speler => {
           if (!this.gesmetenSpelers.includes(speler.username) && str !== "") {
             str = str + " en " + speler.username;
             moet = " moeten";
           } else if (!this.gesmetenSpelers.includes(speler.username)) {
             str = speler.username;
-            moet = " moet";
           }
         });
         window.alert(
@@ -104,7 +113,7 @@ export default {
       this.socket.emit("resetGesmetenSpelers", this.lobbyId);
     },
     resetDobbel(steen) {
-      this.socket.emit("resetDobbel", ({room:this.lobbyId, steen:steen}));
+      this.socket.emit("resetDobbel", { room: this.lobbyId, steen: steen });
     },
     resetAllDobbels() {
       if (this.adkDobbel1 !== 0) {

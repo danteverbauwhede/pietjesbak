@@ -41,9 +41,10 @@
         class="button button--prim pietjesbak__stenen__gooi"
         v-on:click="gooiStenen"
         v-if="
-          (this.maxAantalWorpen.waarde === 0 && this.rondeWorpen.waarde < 3) ||
+          ((this.maxAantalWorpen.waarde === 0 && this.rondeWorpen.waarde < 3) ||
             (this.maxAantalWorpen.waarde !== 0 &&
-              this.rondeWorpen.waarde < this.maxAantalWorpen.waarde)
+              this.rondeWorpen.waarde < this.maxAantalWorpen.waarde)) && 
+              (this.aanDeBeurt.naam === this.player)
         "
       >
         smijt
@@ -52,11 +53,12 @@
         id="max-worpen"
         class="button button--sec button--inactive pietjesbak__stenen__gooi"
         v-if="
-          (this.maxAantalWorpen.waarde !== 0 &&
+          (((this.maxAantalWorpen.waarde !== 0 &&
             this.rondeWorpen.waarde === this.maxAantalWorpen.waarde) ||
             (this.maxAantalWorpen.waarde === 0 &&
               this.rondeWorpen.waarde === 3 &&
-              this.maxAantalWorpen.herkans)
+              this.maxAantalWorpen.herkans))) &&
+              (this.aanDeBeurt.naam === this.player)
         "
       >
         max worpen
@@ -67,11 +69,21 @@
         v-on:click="opnieuwGooien"
         v-if="
           this.maxAantalWorpen.waarde === 0 &&
-            this.rondeWorpen.waarde === 3 &&
-            this.maxAantalWorpen.herkans === false
+          this.rondeWorpen.waarde === 3 &&
+          this.maxAantalWorpen.herkans === false  && 
+          this.aanDeBeurt.naam === this.player
         "
       >
         herdoen
+      </div>
+      <div
+        id="smijt"
+        class="button button--prim pietjesbak__stenen__gooi button--inactive"
+        v-if="
+          this.aanDeBeurt.naam !== this.player
+        "
+      >
+        pas à toi, erpel
       </div>
     </div>
     <p style="text-align: start">Aan de kant gehouden dobbelstenen.</p>
@@ -132,7 +144,10 @@ export default {
       rondeWorpen: {},
       actionBusy: {},
       gameStarted: false,
-      lobbyId: ""
+      lobbyId: "",
+      aanDeBeurt: {
+        naam: ""
+      }
     };
   },
   created() {
@@ -153,10 +168,17 @@ export default {
       this.rondeWorpen = data.gameData.rondeWorpen;
       this.actionBusy = data.gameData.actionBusy;
       this.gameStarted = data.gameData.gameStarted;
-      
+      this.checkActivePlayer(data.gameData.users);
     });
   },
   methods: {
+    checkActivePlayer(spelers) {
+      spelers.forEach(speler => {
+        if(speler.active === true) { 
+          this.aanDeBeurt.naam = speler.username; 
+        }
+      });
+    },
     gooiStenen() {
       if (this.gameData.actionBusy && this.gameData.gameStarted) {
         window.alert("Je moet wachten tot alle dobbelstenen gesmeten zijn!");

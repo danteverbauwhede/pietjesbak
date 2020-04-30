@@ -39,11 +39,7 @@
 <script>
 export default {
   name: "Lobby",
-  props: [
-    "socket",
-    "gameData",
-    "lobbySpelers"
-  ],
+  props: ["socket", "gameData", "lobbySpelers"],
   data() {
     return {
       gameSpelers: [],
@@ -53,8 +49,7 @@ export default {
   created() {
     this.gameSpelers = this.gameData.users;
     this.lobbyId = this.$route.params.lobbyId;
-    this.socket.on("connect", () => {
-    });
+    this.socket.on("connect", () => {});
   },
   mounted() {
     this.socket.on("lobbyData", data => {
