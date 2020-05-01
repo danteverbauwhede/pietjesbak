@@ -2,6 +2,7 @@ const express = require("express")();
 const server = require("http").Server(express);
 const port = process.env.PORT || 3000;
 const io = require("socket.io")(server);
+const cors = require('cors');
 const {userJoin, getCurrentUser} = require("./utils/users.js");
 const {createParty} = require("./utils/partyData.js");
 const {
@@ -13,7 +14,7 @@ const {
   startPietjesbak
 } = require("./utils/lobbyFunctions.js");
 
-server.use( express.static(__dirname + '/../../build') )
+const router = require('./router');
 
 let admin = false;
 
@@ -456,6 +457,8 @@ io.on("connection", socket => {
 //   })
 // });
 
+express.use(router);
+express.use(cors());
 
 server.listen(port, () => {
 });

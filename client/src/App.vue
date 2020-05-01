@@ -4,14 +4,19 @@
       <h1>Dobbelen met Vita</h1>
     </header>
     <section class="width main">
-      <router-view />
+      <router-view v-bind:port="this.port" />
     </section>
   </div>
 </template>
 
 <script>
 export default {
-  name: "App"
+  name: "App",
+  data() {
+    return {
+      port: "http://localhost:3000"
+    }
+  },
 };
 </script>
 

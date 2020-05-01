@@ -51,6 +51,9 @@
 import io from "socket.io-client";
 export default {
   name: "Home",
+  props: [
+    "port"
+  ],
   data() {
     return {
       socket: {},
@@ -60,7 +63,7 @@ export default {
     };
   },
   created() {
-    this.socket = io("/");
+    this.socket = io(this.port);
     this.socket.on("connect", () => {
       this.lobbyId = this.socket.id;
     });

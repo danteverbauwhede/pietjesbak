@@ -62,6 +62,9 @@ export default {
   components: {
     Pietjesbak
   },
+  props: [
+    "port"
+  ],
   data() {
     return {
       socket: {},
@@ -81,8 +84,7 @@ export default {
       username: this.userName,
       room: this.lobbyId
     };
-
-    this.socket = io("/");
+    this.socket = io(this.port);
     this.socket.on("connect", () => {
       this.socket.emit("joinRoom", player);
     });
