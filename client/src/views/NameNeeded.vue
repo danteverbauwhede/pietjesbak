@@ -33,7 +33,7 @@ export default {
     };
   },
   created() {
-    this.socket = io("http://localhost:3000");
+    this.socket = io("/");
     this.socket.on("connect", () => {
       this.lobbyId = this.socket.id;
     });

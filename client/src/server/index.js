@@ -13,6 +13,8 @@ const {
   startPietjesbak
 } = require("./utils/lobbyFunctions.js");
 
+server.use( express.static(__dirname + '/../../build') )
+
 let admin = false;
 
 let lobbyData = {
