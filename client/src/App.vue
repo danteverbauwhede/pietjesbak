@@ -14,7 +14,7 @@ export default {
   name: "App",
   data() {
     return {
-      port: "http://localhost:3000"
+      port: "https://pietjesbak-server.herokuapp.com/"
     }
   },
 };
