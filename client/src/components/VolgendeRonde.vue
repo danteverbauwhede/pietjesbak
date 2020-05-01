@@ -6,14 +6,14 @@
       v-bind:class="{ 'hidden': !this.iedereenGesmeten }"
       v-on:click="volgendeRonde"
     >
-      Volgende Ronde
+      Door naar volgende ronde.
     </div>
     <div
       v-else
       class="button button--sec button--inactive"
       v-bind:class="{ 'hidden': !this.iedereenGesmeten }"
     >
-      Waiting for admin
+      Wachten op admin om door te gaan.
     </div>
   </div>
 </template>
@@ -61,7 +61,6 @@ export default {
   },
   computed: {
     iedereenGesmeten: function() {
-      console.log(this.gesmetenSpelers, this.spelers.length);
       if (this.gesmetenSpelers.length === this.spelers.length) {
         return true;
       } else {

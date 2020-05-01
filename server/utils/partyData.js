@@ -39,7 +39,8 @@ function GameData() {
     waarde: 0,
     door: ""
   },
-  this.gesmetenSpelers = []
+  this.gesmetenSpelers = [],
+  this.gameEnded = false
 }
 
 function createParty(user, room) {

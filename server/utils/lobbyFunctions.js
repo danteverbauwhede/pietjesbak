@@ -54,11 +54,20 @@ startPietjesbak = party => {
   })
 }
 
+gameEnded = party => {
+  party.gameData.gameStarted = false;
+  party.gameData.gameEnded = true;
+  setInterval(() => {
+    party.gameData.gameEnded = false;
+  }, 5000);
+}
+
 module.exports = {
   chooseFirstPlayer,
   lobbyPlayersToGame,
   makeActive,
   toggleActionBusy,
   toggleActionDone,
-  startPietjesbak
+  startPietjesbak,
+  gameEnded
 }

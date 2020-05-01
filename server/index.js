@@ -11,7 +11,8 @@ const {
   makeActive,
   toggleActionBusy,
   toggleActionDone,
-  startPietjesbak
+  startPietjesbak,
+  gameEnded,
 } = require("./utils/lobbyFunctions.js");
 
 const router = require('./router');
@@ -416,6 +417,10 @@ io.on("connection", socket => {
     lobbyData.rooms[room].gameData.users.forEach(speler => {
       if (speler.username === lobbyData.rooms[room].gameData.laagste.door) {
         speler.totaalPunten -= lobbyData.rooms[room].gameData.hoogste.punten;
+        if (speler.totaalPunten <= 0) {
+          speler.totaalPunten -= lobbyData.rooms[room].gameData.hoogste.punten;
+          gameEnded(lobbyData.rooms[room]);
+        }
       }
     });
     lobbyData.rooms[room].gameData.users.forEach(speler => {

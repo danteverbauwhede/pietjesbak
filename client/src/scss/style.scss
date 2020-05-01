@@ -17,7 +17,7 @@ body {
   box-sizing: border-box;
   background-color: var(--bg);
   font-weight: 400;
-  font-size: 1.8rem;
+  font-size: 1.4rem;
   height: 100%;
   font-family: Avenir,
   Helvetica,
@@ -48,7 +48,7 @@ strong {
 }
 
 .button {
-  font-size: 2rem;
+  font-size: 1.6rem;
   border: none;
   padding: 1rem 2rem;
   text-align: center;
@@ -207,9 +207,21 @@ strong {
     flex-wrap: wrap;
 
     & > .button {
-      font-size: 1.6rem;
+      font-size: 1.4rem;
     }
   }
+}
+
+.partycode {
+  align-self: center;
+  border: solid .1rem var(--sec);
+  padding: 1rem;
+  display: flex;
+  justify-content: space-evenly;
+
+    & :last-child {
+      font-weight: 800;
+    }
 }
 
 .gameview{
@@ -268,7 +280,7 @@ strong {
   height: 100%;
   text-align: center;
   display: grid;
-  grid-template-rows: 5vh auto 10vh;
+  grid-template-rows: 5vh auto 10vh 10rem;
   padding: 2rem 0;
 
   &__player-list {
@@ -336,9 +348,9 @@ strong {
 
     &__button {
 
-      &:first-child {
-        margin-right: 2rem;
-      }
+      // &:first-child {
+      //  margin-right: 2rem;
+      // }
     }
   }
 }

@@ -47,7 +47,7 @@
               (this.aanDeBeurt.naam === this.player)
         "
       >
-        smijt
+        Rol de dajs
       </div>
       <div
         id="max-worpen"
@@ -74,7 +74,7 @@
           this.aanDeBeurt.naam === this.player
         "
       >
-        herdoen
+        herdoen (- punt)
       </div>
       <div
         id="smijt"
@@ -83,7 +83,7 @@
           this.aanDeBeurt.naam !== this.player
         "
       >
-        pas à toi, erpel
+        pas à toi eh, erpel
       </div>
     </div>
     <p style="text-align: start">Aan de kant gehouden dobbelstenen.</p>

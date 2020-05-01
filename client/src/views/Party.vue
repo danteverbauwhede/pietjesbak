@@ -7,6 +7,13 @@
         v-bind:lobbySpelers="this.lobbySpelers"
       />
     </div>
+    <div v-if="this.gameEnded">
+      <GameEnded
+        v-bind:socket="this.socket"
+        v-bind:gameData="this.gameData"
+        v-bind:lobbySpelers="this.lobbySpelers"
+      />
+    </div>
     <div v-else class="home">
       <header>
         <h2>Welgekomen</h2>
@@ -22,7 +29,7 @@
           >
             <div class="home__player-list__player__img">
               <img
-                src="@/assets/thibo.jpeg"
+                src="@/assets/matties.jpeg"
                 alt="profile pic"
                 width="150"
                 height="150"
@@ -49,6 +56,10 @@
           > -->
         </ul>
       </div>
+      <div class="partycode">
+        <p>Partycode</p>
+        <p> {{ this.lobbyId }} </p>
+      </div>
     </div>
   </div>
 </template>
@@ -56,11 +67,13 @@
 <script>
 import io from "socket.io-client";
 import Pietjesbak from "../components/Pietjesbak.vue";
+import GameEnded from "../components/GameEnded.vue";
 
 export default {
   name: "Party",
   components: {
-    Pietjesbak
+    Pietjesbak,
+    GameEnded
   },
   props: [
     "port"
@@ -74,7 +87,8 @@ export default {
       player: {},
       gameData: {},
       admin: "",
-      gameStarted: false
+      gameStarted: false,
+      gameEnded: false
     };
   },
   created() {
@@ -100,6 +114,7 @@ export default {
         }
       });
       this.gameStarted = data.gameData.gameStarted;
+      this.gameEnded = data.gameData.gameEnded;
     });
     this.socket.on("logData", poepie => {
       console.log(poepie);

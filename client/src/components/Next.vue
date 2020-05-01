@@ -6,7 +6,7 @@
       v-bind:class="{ 'button--inactive': this.rondeWorpen.waarde === 0 }"
       v-on:click="nextButton"
     >
-      Ja, 't is goed azo!
+      't is aan de volgenden.
     </div>
     <div
       v-else
