@@ -66,6 +66,20 @@ function createParty(user, room) {
   return createdRoom
 }
 
+function restartGame(users, room) {
+  const gameData = new GameData();
+  const createdRoom = {
+    name: room,
+    users,
+    gameData
+  };
+
+  parties[room] = createdRoom
+
+  return createdRoom
+}
+
 module.exports = {
-  createParty
+  createParty,
+  restartGame
 }

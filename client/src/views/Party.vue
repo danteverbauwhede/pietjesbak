@@ -9,9 +9,7 @@
     </div>
     <div v-if="this.gameEnded">
       <GameEnded
-        v-bind:socket="this.socket"
-        v-bind:gameData="this.gameData"
-        v-bind:lobbySpelers="this.lobbySpelers"
+        v-bind:loser="this.loser"
       />
     </div>
     <div v-else class="home">
@@ -57,7 +55,7 @@
         </ul>
       </div>
       <div class="partycode">
-        <p>Partycode</p>
+        <p>Partycode:</p>
         <p> {{ this.lobbyId }} </p>
       </div>
     </div>
@@ -88,7 +86,8 @@ export default {
       gameData: {},
       admin: "",
       gameStarted: false,
-      gameEnded: false
+      gameEnded: false,
+      loser: ""
     };
   },
   created() {
@@ -118,6 +117,9 @@ export default {
     });
     this.socket.on("logData", poepie => {
       console.log(poepie);
+    });
+    this.socket.on("loser", $loser => {
+      this.loser = $loser
     });
   },
   methods: {

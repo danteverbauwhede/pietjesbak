@@ -12,6 +12,12 @@ lobbyPlayersToGame = (party) => {
 
   startPietjesbak(party);
 }
+gamePlayersToLobby = (party) => {
+  party.gameData.users.forEach(player => {
+    party.users.push(player);
+  })
+  party.gameData.users = [];
+}
 
 chooseFirstPlayer = (io, party, room) => {
   for (let i = 0; i < 10; i++) {
@@ -65,6 +71,7 @@ gameEnded = party => {
 module.exports = {
   chooseFirstPlayer,
   lobbyPlayersToGame,
+  gamePlayersToLobby,
   makeActive,
   toggleActionBusy,
   toggleActionDone,

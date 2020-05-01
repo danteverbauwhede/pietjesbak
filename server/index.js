@@ -4,7 +4,10 @@ const port = process.env.PORT || 3000;
 const io = require("socket.io")(server);
 const cors = require('cors');
 const {userJoin, getCurrentUser} = require("./utils/users.js");
-const {createParty} = require("./utils/partyData.js");
+const {
+  createParty,
+  restartGame
+} = require("./utils/partyData.js");
 const {
   chooseFirstPlayer,
   lobbyPlayersToGame,
@@ -13,6 +16,7 @@ const {
   toggleActionDone,
   startPietjesbak,
   gameEnded,
+  gamePlayersToLobby
 } = require("./utils/lobbyFunctions.js");
 
 const router = require('./router');
@@ -418,8 +422,11 @@ io.on("connection", socket => {
       if (speler.username === lobbyData.rooms[room].gameData.laagste.door) {
         speler.totaalPunten -= lobbyData.rooms[room].gameData.hoogste.punten;
         if (speler.totaalPunten <= 0) {
-          speler.totaalPunten -= lobbyData.rooms[room].gameData.hoogste.punten;
           gameEnded(lobbyData.rooms[room]);
+          io.to(room).emit("loser", speler.username);
+          const party = restartGame(lobbyData.users, room);
+          lobbyData.rooms[room] = party;
+          gamePlayersToLobby(lobbyData.rooms[room])
         }
       }
     });
