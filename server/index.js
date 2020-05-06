@@ -482,7 +482,7 @@ endGame = (room, speler) => {
   io.to(room).emit("loser", speler.username);
 
   const party = restartGame(lobbyData.users, room);
-  io.to(room).emit("logData", party)
+  // io.to(room).emit("logData", party)
 
   // lobbyData.rooms[room] = party;
   gamePlayersToLobby(lobbyData.rooms[room])

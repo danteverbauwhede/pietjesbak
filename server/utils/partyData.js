@@ -39,6 +39,10 @@ function GameData() {
     waarde: 0,
     door: ""
   },
+  this.dupliqué = {
+    vanToepassing: false,
+    users: [],
+  }
   this.gesmetenSpelers = [],
   this.gameEnded = false
 }

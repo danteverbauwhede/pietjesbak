@@ -100,10 +100,31 @@ export default {
         );
         return;
       }
+      this.spelers.forEach(speler => {        
+        if (speler.worp === this.laagste.waarde && speler.username !== this.laagste.door) {
+          this.shootOut();
+        }
+      });
       this.socket.emit("volgendeRonde", this.lobbyId);
       this.resetMaxWorpen();
       this.resetAllDobbels();
       this.resetGesmetenSpelers();
+    },
+    shootOut() {
+      const dupliquéSpelers = [];
+      this.spelers.forEach(speler => { 
+        if (speler.username === this.laagste.door) {
+          dupliquéSpelers.push(speler)
+        };     
+        if (speler.worp === this.laagste.waarde && speler.username !== this.laagste.door) {
+          dupliquéSpelers.push(speler)
+        }
+      });
+      let str = ""
+      dupliquéSpelers.forEach(dupSpeler => {
+        str = str + ", " + dupSpeler.username;
+      })
+      window.alert("Deze pipo's mogen hersmijten:" + str);
     },
     resetMaxWorpen() {
       this.socket.emit("resetMaxWorpen", this.lobbyId);

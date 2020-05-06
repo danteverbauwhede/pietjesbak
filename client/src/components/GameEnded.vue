@@ -12,7 +12,6 @@ export default {
   name: "GameEnded",
   props: ["loser", "gameData"],
   mounted() {
-    console.log(this.gameData)
   },
 };
 </script>
