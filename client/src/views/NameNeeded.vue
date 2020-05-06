@@ -12,7 +12,7 @@
     </div>
     <div>
       <router-link
-        :to="this.giftedLobbyId + '/' + this.username"
+        :to="'/lobby/' + this.giftedLobbyId + '/' + this.username"
         class="button button--prim"
         >Join Party</router-link
       >

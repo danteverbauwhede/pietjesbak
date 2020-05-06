@@ -10,6 +10,9 @@
 
 export default {
   name: "GameEnded",
-  props: ["loser"],
+  props: ["loser", "gameData"],
+  mounted() {
+    console.log(this.gameData)
+  },
 };
 </script>

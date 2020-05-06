@@ -22,7 +22,7 @@ const routes = [
   },
   {
     path: "*",
-    component: () => import("../views/Home.vue")
+    component: () => import("../views/NietsTeZien.vue")
   }
   // {
   //   path: "/lobby/:lobbyId/pietjesbak",

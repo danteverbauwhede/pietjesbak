@@ -28,7 +28,7 @@
     <div class="lobby__buttons">
       <router-link
         to="/"
-        v-on:click.native="this.leaveLobby"
+        v-on:click.native="leaveLobby"
         class="button button--sec"
         >Party verlaten</router-link
       >
@@ -43,19 +43,30 @@ export default {
   data() {
     return {
       gameSpelers: [],
-      lobbyId: ""
+      lobbyId: "",
+      player: ""
     };
   },
   created() {
     this.gameSpelers = this.gameData.users;
     this.lobbyId = this.$route.params.lobbyId;
+    this.player = this.$route.params.userName;
     this.socket.on("connect", () => {});
   },
   mounted() {
     this.socket.on("lobbyData", data => {
       this.gameSpelers = data.gameData.users;
     });
-  }
+  }, methods: {
+    leaveLobby() {
+      const room = this.lobbyId;
+      const player = this.player;
+      this.socket.emit('leaveLobby', {
+        room,
+        player
+      })
+    }
+  },
 };
 </script>
 

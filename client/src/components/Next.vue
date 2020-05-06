@@ -6,7 +6,7 @@
       v-bind:class="{ 'button--inactive': this.rondeWorpen.waarde === 0 }"
       v-on:click="nextButton"
     >
-      't is aan de volgenden.
+      beurt afronden.
     </div>
     <div
       v-else
@@ -113,15 +113,11 @@ export default {
       //   if (speler.punten !== 0 && speler.username === this.player) {
           if (!this.gesmetenSpelers.includes(this.player)) {
             this.addGesmetenSpelers(this.player);
-            console.log("nog eens:", this.gesmetenSpelers);
-            
           }
         // }
       // });
 
       this.completeStats();
-
-      console.log(this.gesmetenSpelers);
       
       if (this.gesmetenSpelers.length === (this.spelers.length - 1)) {
         this.deselectAllPlayers();

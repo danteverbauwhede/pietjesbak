@@ -105,6 +105,17 @@ io.on("connection", socket => {
     io.to(user.room).emit("lobbyData", lobbyData.rooms[room]);
     // io.emit("logData", lobbyData.rooms[room]);
   });
+  socket.on("leaveLobby", ({room, player}) => {
+    console.log(lobbyData.rooms[room].users);
+    lobbyData.rooms[room].gameData.users = lobbyData.rooms[room].gameData.users.filter(userObj => {      
+      return userObj.username !== player
+    })
+    lobbyData.rooms[room].users = lobbyData.rooms[room].users.filter(userObj => {
+      return userObj.username !== player
+    })
+    console.log(lobbyData.rooms[room].users);
+    io.to(room).emit("lobbyData", lobbyData.rooms[room]);
+  });
 
    socket.on("startPb", (room) => {    
     lobbyData.rooms[room].gameData.gameStarted = true;
@@ -421,12 +432,9 @@ io.on("connection", socket => {
     lobbyData.rooms[room].gameData.users.forEach(speler => {
       if (speler.username === lobbyData.rooms[room].gameData.laagste.door) {
         speler.totaalPunten -= lobbyData.rooms[room].gameData.hoogste.punten;
+        io.to(room).emit("lobbyData", lobbyData.rooms[room]);
         if (speler.totaalPunten <= 0) {
-          gameEnded(lobbyData.rooms[room]);
-          io.to(room).emit("loser", speler.username);
-          const party = restartGame(lobbyData.users, room);
-          lobbyData.rooms[room] = party;
-          gamePlayersToLobby(lobbyData.rooms[room])
+          endGame(room, speler);
         }
       }
     });
@@ -468,6 +476,17 @@ io.on("connection", socket => {
 //     room.users.
 //   })
 // });
+
+endGame = (room, speler) => {
+  gameEnded(lobbyData.rooms[room]);
+  io.to(room).emit("loser", speler.username);
+
+  const party = restartGame(lobbyData.users, room);
+  io.to(room).emit("logData", party)
+
+  // lobbyData.rooms[room] = party;
+  gamePlayersToLobby(lobbyData.rooms[room])
+}
 
 express.use(router);
 express.use(cors());

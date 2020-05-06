@@ -14,6 +14,7 @@
         <div
           id="dobbel1"
           class="dobbelsteen"
+          v-bind:class="{ 'aan-het-rollen' : this.actionBusy }"
           v-if="adkDobbels.adkDobbel1 === 0"
           v-on:click="adkDobbel(1)"
         >
@@ -22,6 +23,7 @@
         <div
           id="dobbel2"
           class="dobbelsteen"
+          v-bind:class="{ 'aan-het-rollen' : this.actionBusy }"
           v-if="adkDobbels.adkDobbel2 === 0"
           v-on:click="adkDobbel(2)"
         >
@@ -30,6 +32,7 @@
         <div
           id="dobbel3"
           class="dobbelsteen"
+          v-bind:class="{ 'aan-het-rollen' : this.actionBusy }"
           v-if="adkDobbels.adkDobbel3 === 0"
           v-on:click="adkDobbel(3)"
         >

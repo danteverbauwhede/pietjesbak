@@ -7,8 +7,9 @@
         v-bind:lobbySpelers="this.lobbySpelers"
       />
     </div>
-    <div v-if="this.gameEnded">
+    <div v-else-if="this.gameEnded">
       <GameEnded
+        v-bind:gameData="this.gameData"
         v-bind:loser="this.loser"
       />
     </div>
@@ -101,17 +102,20 @@ export default {
     this.socket.on("connect", () => {
       this.socket.emit("joinRoom", player);
     });
+    window.addEventListener(`beforeunload`, this.leaveLobby);
   },
   mounted() {
     this.socket.on("lobbyData", data => {
       this.lobbySpelers = data.users;
       this.gameData = data.gameData;
 
-      data.users.forEach(user => {
-        if (user.admin) {
-          this.admin = user.userId;
-        }
-      });
+      if (data.users) {
+        data.users.forEach(user => {
+          if (user.admin) {
+            this.admin = user.userId;
+          }
+        });
+      }
       this.gameStarted = data.gameData.gameStarted;
       this.gameEnded = data.gameData.gameEnded;
     });
@@ -128,8 +132,13 @@ export default {
         this.socket.emit("startPb", this.lobbyId);
       }
     },
-    leaveRoom() {
-      this.socket.emit("leaveRoom", this.lobbyId);
+    leaveLobby() {
+      const room = this.lobbyId;
+      const player = this.userName;
+      this.socket.emit('leaveLobby', {
+        room,
+        player
+      })
     }
   }
 };

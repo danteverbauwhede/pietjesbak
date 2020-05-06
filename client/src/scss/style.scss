@@ -380,6 +380,11 @@ strong {
         margin-right: 2rem;
       }
 
+      & > .aan-het-rollen {
+        color: white;
+        background-color: var(--sec);
+      }
+
       &__wrap {
         display: flex;
         justify-content: space-between;
