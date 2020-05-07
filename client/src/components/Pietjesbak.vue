@@ -17,9 +17,15 @@
         v-bind:lobbySpelers="this.lobbySpelers"
       />
       <GameStats
+        v-if="!this.dupliqueVanToep"
         v-bind:socket="this.socket"
         v-bind:gameData="this.gameData"
         v-bind:lobbySpelers="this.lobbySpelers"
+      />
+      <DupliqueBattle
+        v-if="this.dupliqueVanToep"
+        v-bind:socket="this.socket"
+        v-bind:gameData="this.gameData"
       />
       <VolgendeRonde
         v-bind:socket="this.socket"
@@ -39,6 +45,7 @@ import GameStats from "@/components/GameStats.vue";
 import Next from "@/components/Next.vue";
 import VolgendeRonde from "@/components/VolgendeRonde.vue";
 import Lobby from "@/components/Lobby.vue";
+import DupliqueBattle from "@/components/DupliqueBattle.vue";
 
 export default {
   name: "Pietjesbak",
@@ -46,7 +53,8 @@ export default {
   data() {
     return {
       lobbyId: "",
-      spelers: []
+      spelers: [],
+      dupliqueVanToep: false
     };
   },
   components: {
@@ -54,7 +62,8 @@ export default {
     GameStats,
     Next,
     VolgendeRonde,
-    Lobby
+    Lobby,
+    DupliqueBattle
   },
   created() {
     this.socket.on("connect", () => {});
@@ -62,6 +71,7 @@ export default {
   mounted() {
     this.socket.on("lobbyData", data => {
       this.spelers = data.users;
+      this.dupliqueVanToep = data.gameData.dupliqué.vanToepassing;
     });
     this.mountBak();
   },

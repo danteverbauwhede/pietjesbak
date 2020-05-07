@@ -32,7 +32,11 @@ export default {
       adkDobbels: {},
       gesmetenSpelers: [],
       lobbyId: "",
-      admin: ""
+      admin: "",
+      dupliqué: {
+        users: [],
+        vanToepassing: false
+      }
     };
   },
   created() {
@@ -57,6 +61,7 @@ export default {
           this.admin = user.userId;
         }
       });
+      this.dupliqué = data.gameData.dupliqué;
     });
   },
   computed: {
@@ -100,15 +105,32 @@ export default {
         );
         return;
       }
-      this.spelers.forEach(speler => {        
-        if (speler.worp === this.laagste.waarde && speler.username !== this.laagste.door) {
-          this.shootOut();
-        }
-      });
-      this.socket.emit("volgendeRonde", this.lobbyId);
-      this.resetMaxWorpen();
-      this.resetAllDobbels();
-      this.resetGesmetenSpelers();
+      const check = [];
+      if (!this.dupliqué.vanToepassing) {
+        this.spelers.forEach(speler => {        
+          if (speler.worp === this.laagste.waarde && speler.username !== this.laagste.door) {
+            check.push(speler)
+          }
+        });
+      } else {
+        this.dupliqué.users.forEach(speler => {        
+          if (speler.worp === this.laagste.waarde && speler.username !== this.laagste.door) {
+            check.push(speler)
+          }
+        });
+      }
+      if (check.length !== 0) {
+        this.shootOut();
+        this.setMaxWorpenToShootOut();
+        this.resetAllDobbels();
+        this.resetGesmetenSpelers();
+      } else {
+        this.socket.emit("volgendeRonde", this.lobbyId);
+        this.resetMaxWorpen();
+        this.resetAllDobbels();
+        this.resetGesmetenSpelers();
+        this.resetIfShootOut();
+      }
     },
     shootOut() {
       const dupliquéSpelers = [];
@@ -124,10 +146,17 @@ export default {
       dupliquéSpelers.forEach(dupSpeler => {
         str = str + ", " + dupSpeler.username;
       })
-      window.alert("Deze pipo's mogen hersmijten:" + str);
+      const room = this.lobbyId
+      this.socket.emit("startShootOut", ({room, dupliquéSpelers}));
     },
     resetMaxWorpen() {
       this.socket.emit("resetMaxWorpen", this.lobbyId);
+    },
+    setMaxWorpenToShootOut() {
+      this.socket.emit("setMaxWorpenToShootOut", this.lobbyId);
+    },
+    resetIfShootOut() {
+      this.socket.emit("resetIfShootOut", this.lobbyId);
     },
     resetGesmetenSpelers() {
       this.socket.emit("resetGesmetenSpelers", this.lobbyId);

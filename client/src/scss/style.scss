@@ -212,6 +212,28 @@ strong {
   }
 }
 
+.shootout {
+  &__actieve-speler {
+    
+    & > div {
+      position: relative;
+      
+      & > p {
+        color: var(--prim);
+        align-self: center;
+        
+        &::before {
+          position: absolute;
+          left: -2rem;
+          width: 1rem;
+          height: 1rem;
+          content: url(./assets/stip.svg);
+        }
+      }
+    }
+  }
+}
+
 .partycode {
   align-self: center;
   border: solid .1rem var(--sec);

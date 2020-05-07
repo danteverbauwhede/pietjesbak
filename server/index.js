@@ -16,7 +16,8 @@ const {
   toggleActionDone,
   startPietjesbak,
   gameEnded,
-  gamePlayersToLobby
+  gamePlayersToLobby,
+  chooseFirstShootOutPlayer
 } = require("./utils/lobbyFunctions.js");
 
 const router = require('./router');
@@ -106,14 +107,14 @@ io.on("connection", socket => {
     // io.emit("logData", lobbyData.rooms[room]);
   });
   socket.on("leaveLobby", ({room, player}) => {
-    console.log(lobbyData.rooms[room].users);
+    // console.log(lobbyData.rooms[room].users);
     lobbyData.rooms[room].gameData.users = lobbyData.rooms[room].gameData.users.filter(userObj => {      
       return userObj.username !== player
     })
     lobbyData.rooms[room].users = lobbyData.rooms[room].users.filter(userObj => {
       return userObj.username !== player
     })
-    console.log(lobbyData.rooms[room].users);
+    // console.log(lobbyData.rooms[room].users);
     io.to(room).emit("lobbyData", lobbyData.rooms[room]);
   });
 
@@ -284,34 +285,76 @@ io.on("connection", socket => {
   });
 
   socket.on("addPunten", (room) => {
-    lobbyData.rooms[room].gameData.users.forEach(speler => {
-      if (speler.active) {
-        speler.punten = lobbyData.rooms[room].gameData.tempWorp.punten;
-      }
-    });
+    if (lobbyData.rooms[room].gameData.dupliqué.vanToepassing) {
+      lobbyData.rooms[room].gameData.dupliqué.users.forEach(speler => {
+        if (speler.active) {
+          speler.punten = lobbyData.rooms[room].gameData.tempWorp.punten;
+        }
+      })
+    } else {
+      lobbyData.rooms[room].gameData.users.forEach(speler => {
+        if (speler.active) {
+          speler.punten = lobbyData.rooms[room].gameData.tempWorp.punten;
+        }
+      });
+    }
     io.to(room).emit("lobbyData", lobbyData.rooms[room]);
   });
 
   socket.on("addWorp", (room) => {
-    lobbyData.rooms[room].gameData.users.forEach(speler => {
-      if (speler.active) {
-        speler.worp = lobbyData.rooms[room].gameData.tempWorp.waarde;
-      }
-    });
+    if (lobbyData.rooms[room].gameData.dupliqué.vanToepassing) {
+      lobbyData.rooms[room].gameData.dupliqué.users.forEach(speler => {
+        if (speler.active) {
+          speler.worp = lobbyData.rooms[room].gameData.tempWorp.waarde;
+        }
+      })
+    } else {
+      lobbyData.rooms[room].gameData.users.forEach(speler => {
+        if (speler.active) {
+          speler.worp = lobbyData.rooms[room].gameData.tempWorp.waarde;
+        }
+      });
+    }
     io.to(room).emit("lobbyData", lobbyData.rooms[room]);
+    
   });
 
   socket.on("completeStats", (room) => {
-    if (
-      lobbyData.rooms[room].gameData.hoogste.punten < lobbyData.rooms[room].gameData.tempWorp.punten ||
-      (lobbyData.rooms[room].gameData.tempWorp.waarde === "Pietje 2" &&
-        lobbyData.rooms[room].gameData.hoogste.waarde === "Trieske")
-    ) {
+    if (!lobbyData.rooms[room].gameData.dupliqué.vanToepassing) {
       if (
-        !(
-          lobbyData.rooms[room].gameData.hoogste.waarde === "Pietje 2" &&
-          lobbyData.rooms[room].gameData.tempWorp.waarde === "Trieske"
-        )
+        lobbyData.rooms[room].gameData.hoogste.punten < lobbyData.rooms[room].gameData.tempWorp.punten ||
+        (lobbyData.rooms[room].gameData.tempWorp.waarde === "Pietje 2" &&
+          lobbyData.rooms[room].gameData.hoogste.waarde === "Trieske")
+      ) {
+        if (
+          !(
+            lobbyData.rooms[room].gameData.hoogste.waarde === "Pietje 2" &&
+            lobbyData.rooms[room].gameData.tempWorp.waarde === "Trieske"
+          )
+        ) {
+          lobbyData.rooms[room].gameData.hoogste.waarde = lobbyData.rooms[room].gameData.tempWorp.waarde;
+          lobbyData.rooms[room].gameData.hoogste.punten = lobbyData.rooms[room].gameData.tempWorp.punten;
+          lobbyData.rooms[room].gameData.users.forEach(speler => {
+            if (speler.active) {
+              lobbyData.rooms[room].gameData.hoogste.door = speler.username;
+            }
+          });
+        }
+      } else if (
+        lobbyData.rooms[room].gameData.tempWorp.waarde === "Pietje 2" &&
+        lobbyData.rooms[room].gameData.hoogste.waarde === "Straatje"
+      ) {
+        lobbyData.rooms[room].gameData.hoogste.waarde = lobbyData.rooms[room].gameData.tempWorp.waarde;
+        lobbyData.rooms[room].gameData.hoogste.punten = lobbyData.rooms[room].gameData.tempWorp.punten;
+        lobbyData.rooms[room].gameData.users.forEach(speler => {
+          if (speler.active) {
+            lobbyData.rooms[room].gameData.hoogste.door = speler.username;
+          }
+        });
+      } else if (
+        lobbyData.rooms[room].gameData.hoogste.punten === lobbyData.rooms[room].gameData.tempWorp.punten &&
+        lobbyData.rooms[room].gameData.tempWorp.punten === 1 &&
+        parseInt(lobbyData.rooms[room].gameData.hoogste.waarde) < parseInt(lobbyData.rooms[room].gameData.tempWorp.waarde)
       ) {
         lobbyData.rooms[room].gameData.hoogste.waarde = lobbyData.rooms[room].gameData.tempWorp.waarde;
         lobbyData.rooms[room].gameData.hoogste.punten = lobbyData.rooms[room].gameData.tempWorp.punten;
@@ -321,29 +364,6 @@ io.on("connection", socket => {
           }
         });
       }
-    } else if (
-      lobbyData.rooms[room].gameData.tempWorp.waarde === "Pietje 2" &&
-      lobbyData.rooms[room].gameData.hoogste.waarde === "Straatje"
-    ) {
-      lobbyData.rooms[room].gameData.hoogste.waarde = lobbyData.rooms[room].gameData.tempWorp.waarde;
-      lobbyData.rooms[room].gameData.hoogste.punten = lobbyData.rooms[room].gameData.tempWorp.punten;
-      lobbyData.rooms[room].gameData.users.forEach(speler => {
-        if (speler.active) {
-          lobbyData.rooms[room].gameData.hoogste.door = speler.username;
-        }
-      });
-    } else if (
-      lobbyData.rooms[room].gameData.hoogste.punten === lobbyData.rooms[room].gameData.tempWorp.punten &&
-      lobbyData.rooms[room].gameData.tempWorp.punten === 1 &&
-      parseInt(lobbyData.rooms[room].gameData.hoogste.waarde) < parseInt(lobbyData.rooms[room].gameData.tempWorp.waarde)
-    ) {
-      lobbyData.rooms[room].gameData.hoogste.waarde = lobbyData.rooms[room].gameData.tempWorp.waarde;
-      lobbyData.rooms[room].gameData.hoogste.punten = lobbyData.rooms[room].gameData.tempWorp.punten;
-      lobbyData.rooms[room].gameData.users.forEach(speler => {
-        if (speler.active) {
-          lobbyData.rooms[room].gameData.hoogste.door = speler.username;
-        }
-      });
     }
 
     // --- LAAGSTE --- //
@@ -395,17 +415,39 @@ io.on("connection", socket => {
 
   socket.on("selectNextPlayer", (room) => {
     let i = 0;
-    lobbyData.rooms[room].gameData.users.forEach((speler, index) => {
-      if (speler.active) {
-        speler.active = false;
-        if (index !== lobbyData.rooms[room].gameData.users.length - 1) {
-          i = index + 1;
-        } else {
-          i = 0;
+    if (lobbyData.rooms[room].gameData.dupliqué.vanToepassing) {
+      lobbyData.rooms[room].gameData.dupliqué.users.forEach((speler, index) => {
+        if (speler.active) {
+          speler.active = false;
+          if (index !== lobbyData.rooms[room].gameData.dupliqué.users.length - 1) {
+            i = index + 1;
+          } else {
+            i = 0;
+          }
         }
-      }
-    });
-    lobbyData.rooms[room].gameData.users[i].active = true;
+      });
+      lobbyData.rooms[room].gameData.users.forEach((speler) => {
+        if (speler.active) {
+          speler.active = false;
+        }
+        if (speler.username === lobbyData.rooms[room].gameData.dupliqué.users[i].username) {
+          speler.active = true;
+        }
+      });
+      lobbyData.rooms[room].gameData.dupliqué.users[i].active = true;
+    } else {
+      lobbyData.rooms[room].gameData.users.forEach((speler, index) => {
+        if (speler.active) {
+          speler.active = false;
+          if (index !== lobbyData.rooms[room].gameData.users.length - 1) {
+            i = index + 1;
+          } else {
+            i = 0;
+          }
+        }
+      });
+      lobbyData.rooms[room].gameData.users[i].active = true;
+    }
 
     io.to(room).emit("lobbyData", lobbyData.rooms[room]);
   });
@@ -463,6 +505,23 @@ io.on("connection", socket => {
     lobbyData.rooms[room].gameData.hoogste.punten = 0;
     lobbyData.rooms[room].gameData.aantalWorpen = 0;
 
+    io.to(room).emit("lobbyData", lobbyData.rooms[room]);
+  });
+  socket.on("startShootOut", ({room, dupliquéSpelers}) => {
+    lobbyData.rooms[room].gameData.dupliqué.users = dupliquéSpelers;
+    lobbyData.rooms[room].gameData.dupliqué.vanToepassing = true;
+    chooseFirstShootOutPlayer(io, lobbyData.rooms[room], room);
+    io.to(room).emit("lobbyData", lobbyData.rooms[room]);
+  });
+  socket.on("setMaxWorpenToShootOut", (room) => {
+    lobbyData.rooms[room].gameData.maxAantalWorpen.waarde = 1;
+    lobbyData.rooms[room].gameData.maxAantalWorpen.door = "";
+    lobbyData.rooms[room].gameData.maxAantalWorpen.herkans = true;
+    io.to(room).emit("lobbyData", lobbyData.rooms[room]);
+  });
+  socket.on("resetIfShootOut", (room) => {
+    lobbyData.rooms[room].gameData.dupliqué.users = [];
+    lobbyData.rooms[room].gameData.dupliqué.vanToepassing = false;
     io.to(room).emit("lobbyData", lobbyData.rooms[room]);
   });
   // socket.on("", (room) => {

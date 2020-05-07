@@ -47,6 +47,10 @@ export default {
       gesmetenSpelers: [],
       aanDeBeurt: {
         naam: ""
+      },
+      duplique: {
+        users: [],
+        vanToepassing: false
       }
     };
   },
@@ -76,6 +80,7 @@ export default {
       this.laagste = data.gameData.laagste;
       this.spelers = data.gameData.users;
       this.gesmetenSpelers = data.gameData.gesmetenSpelers;
+      this.dupliqué = data.gameData.dupliqué;
       this.checkActivePlayer();
     });
   },
@@ -119,7 +124,9 @@ export default {
 
       this.completeStats();
       
-      if (this.gesmetenSpelers.length === (this.spelers.length - 1)) {
+      if (this.dupliqué.vanToepassing && this.gesmetenSpelers.length === (this.dupliqué.users.length - 1)) {
+        this.deselectAllPlayers();
+      } else if (!this.dupliqué.vanToepassing && this.gesmetenSpelers.length === (this.spelers.length - 1)) {
         this.deselectAllPlayers();
       } else {
         this.selectNextPlayer();

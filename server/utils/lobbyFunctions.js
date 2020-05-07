@@ -34,8 +34,36 @@ chooseFirstPlayer = (io, party, room) => {
   }
   
 }
+chooseFirstShootOutPlayer = (io, party, room) => {
+    const randomPlayer = Math.floor(Math.random() * party.gameData.users.length);
+    
+    if (party.gameData.dupliqué.users[randomPlayer]) {
+      makeShootOutPlayerActive(party, party.gameData.dupliqué.users[randomPlayer].username);
+      io.to(room).emit("lobbyData", party);
+    }
+
+}
 
 makeActive = (party, naam)  => {
+  party.gameData.users.forEach(speler => {
+    speler.active = false;
+  });
+  party.gameData.users.forEach(speler => {
+    if (speler.username === naam) {
+      speler.active = true;
+    }
+  });
+}
+
+makeShootOutPlayerActive = (party, naam) => {
+  party.gameData.dupliqué.users.forEach(speler => {
+    speler.active = false;
+  });
+  party.gameData.dupliqué.users.forEach(speler => {
+    if (speler.username === naam) {
+      speler.active = true;
+    }
+  });
   party.gameData.users.forEach(speler => {
     speler.active = false;
   });
@@ -76,5 +104,6 @@ module.exports = {
   toggleActionBusy,
   toggleActionDone,
   startPietjesbak,
-  gameEnded
+  gameEnded,
+  chooseFirstShootOutPlayer
 }

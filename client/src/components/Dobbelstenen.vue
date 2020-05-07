@@ -176,6 +176,7 @@ export default {
   },
   methods: {
     checkActivePlayer(spelers) {
+      this.aanDeBeurt.naam = "";
       spelers.forEach(speler => {
         if(speler.active === true) { 
           this.aanDeBeurt.naam = speler.username; 
