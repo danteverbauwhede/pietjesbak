@@ -91,7 +91,7 @@ startPietjesbak = party => {
 gameEnded = party => {
   party.gameData.gameStarted = false;
   party.gameData.gameEnded = true;
-  setInterval(() => {
+  setTimeout(() => {
     party.gameData.gameEnded = false;
   }, 5000);
 }

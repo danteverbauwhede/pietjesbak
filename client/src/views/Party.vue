@@ -28,7 +28,7 @@
           >
             <div class="home__player-list__player__img">
               <img
-                src="@/assets/victor.jpeg"
+                src="@/assets/matties.jpeg"
                 alt="profile pic"
                 width="150"
                 height="150"

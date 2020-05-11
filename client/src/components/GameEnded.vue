@@ -1,6 +1,8 @@
 <template>
   <div class="width main">
-    <h3>Eat shit, {{ loser }} is verloren</h3>
+    <h3>Salamandraré</h3>
+    <p>Proficiat {{ loser }}, pakt u een pintje.</p>
+    <div>Oké, kheb een pintje</div>
   </div>
 </template>
 
