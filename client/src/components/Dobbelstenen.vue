@@ -233,13 +233,19 @@ export default {
     addRondeWorp() {
       this.socket.emit("addRondeWorp", this.lobbyId);
     },
-    adkDobbel(steen) {      
-      if (this.rondeWorpen.waarde !== 0) {
-        this.socket.emit("adkDobbel", ({room:this.lobbyId, steen:steen}));
+    adkDobbel(steen) {    
+      // this.checkActivePlayer(data.gameData.users);
+      if (this.aanDeBeurt.naam === this.player) {
+        if (this.rondeWorpen.waarde !== 0) {
+          this.socket.emit("adkDobbel", ({room:this.lobbyId, steen:steen}));
+        }
       }
     },
     resetDobbel(steen) {
-      this.socket.emit("resetDobbel", ({room:this.lobbyId, steen:steen}));
+      // this.checkActivePlayer(data.gameData.users);
+      if (this.aanDeBeurt.naam === this.player) {
+        this.socket.emit("resetDobbel", ({room:this.lobbyId, steen:steen}));
+      }
     },
     resetAllDobbels() {
       if (this.adkDobbel1 !== 0) {
