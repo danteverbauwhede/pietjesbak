@@ -57,7 +57,7 @@
         </ul>
       </div>
       <div class="partycode">
-        <div v-on:click="this.endTemp">end</div>
+        <!-- <div v-on:click="this.endTemp">end</div> -->
         <div>
           <p>Partycode:</p>
           <p> {{ this.lobbyId }} </p>
