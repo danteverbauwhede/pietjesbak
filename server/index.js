@@ -17,7 +17,8 @@ const {
   startPietjesbak,
   gameEnded,
   gamePlayersToLobby,
-  chooseFirstShootOutPlayer
+  chooseFirstShootOutPlayer,
+  restartGameAfterEnd
 } = require("./utils/lobbyFunctions.js");
 
 const router = require('./router');
@@ -590,26 +591,25 @@ io.on("connection", socket => {
     }
     io.to(room).emit("lobbyData", lobbyData.rooms[room]);
   });
-  // socket.on("", (room) => {
+  socket.on("restartGameAfterEnd", (room) => {
+    lobbyData.rooms[room].gameData.aftellen = 11;
+    io.to(room).emit("lobbyData", lobbyData.rooms[room]);
 
-  //   io.to(room).emit("lobbyData", lobbyData.rooms[room]);
-  // });
+    restartGameAfterEnd(lobbyData.rooms[room], io, room);
+
+    io.to(room).emit("lobbyData", lobbyData.rooms[room]);
+  });
+  socket.on("tempEndBut", (room) => {
+    endGame(room, lobbyData.rooms[room].users[1])
+    io.to(room).emit("lobbyData", lobbyData.rooms[room]);
+  });
 });
-
-// io.on("disconnection", socket => {
-//   lobbyData.rooms.forEach(room => {
-//     room.users.
-//   })
-// });
 
 endGame = (room, speler) => {
   gameEnded(lobbyData.rooms[room]);
   io.to(room).emit("loser", speler.username);
 
   const party = restartGame(lobbyData.users, room);
-  // io.to(room).emit("logData", party)
-
-  // lobbyData.rooms[room] = party;
   gamePlayersToLobby(lobbyData.rooms[room])
 }
 

@@ -44,7 +44,8 @@ function GameData() {
     users: [],
   }
   this.gesmetenSpelers = [],
-  this.gameEnded = false
+  this.gameEnded = false,
+  this.aftellen = 12
 }
 
 function createParty(user, room) {

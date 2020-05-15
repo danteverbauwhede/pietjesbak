@@ -9,6 +9,7 @@
     </div>
     <div v-else-if="this.gameEnded">
       <GameEnded
+        v-bind:socket="this.socket"
         v-bind:gameData="this.gameData"
         v-bind:loser="this.loser"
       />
@@ -56,6 +57,7 @@
         </ul>
       </div>
       <div class="partycode">
+        <div v-on:click="this.endTemp">end</div>
         <div>
           <p>Partycode:</p>
           <p> {{ this.lobbyId }} </p>
@@ -172,6 +174,9 @@ export default {
         room,
         player
       })
+    },
+    endTemp() {
+      this.socket.emit("tempEndBut", this.lobbyId);
     }
   }
 };

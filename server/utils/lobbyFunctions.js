@@ -91,9 +91,20 @@ startPietjesbak = party => {
 gameEnded = party => {
   party.gameData.gameStarted = false;
   party.gameData.gameEnded = true;
+}
+
+restartGameAfterEnd = (party, io, room) => {    
   setTimeout(() => {
-    party.gameData.gameEnded = false;
-  }, 5000);
+    party.gameData.aftellen--;
+    // console.log(party.gameData.aftellen);
+    if (party.gameData.aftellen >= 0) {
+      restartGameAfterEnd(party, io, room);
+    } else {
+      party.gameData.aftellen = 11
+      party.gameData.gameEnded = false;
+    }
+    io.to(room).emit("lobbyData", party);
+  }, 1000);
 }
 
 module.exports = {
@@ -105,5 +116,6 @@ module.exports = {
   toggleActionDone,
   startPietjesbak,
   gameEnded,
-  chooseFirstShootOutPlayer
+  chooseFirstShootOutPlayer,
+  restartGameAfterEnd
 }
