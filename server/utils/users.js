@@ -1,6 +1,6 @@
 const users = [];
 
-function userJoin(userId, username, room) {
+function makeUser(userId, username, room) {
   const user = {
     userId,
     username,
@@ -18,6 +18,6 @@ function getCurrentUser(id) {
 }
 
 module.exports = {
-  userJoin,
+  makeUser,
   getCurrentUser
 }

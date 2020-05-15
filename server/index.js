@@ -3,7 +3,7 @@ const server = require("http").Server(express);
 const port = process.env.PORT || 3000;
 const io = require("socket.io")(server);
 const cors = require('cors');
-const {userJoin, getCurrentUser} = require("./utils/users.js");
+const {makeUser, getCurrentUser} = require("./utils/users.js");
 const {
   createParty,
   restartGame
@@ -29,6 +29,14 @@ let lobbyData = {
 }
 
 io.on("connection", socket => {
+  socket.on("startPartey", (room) => {
+    // console.log("plieplop");
+    setInterval(() => {
+      if (!lobbyData.rooms[room].gameData.gameStarted) {
+        io.to(room).emit("lobbyData", lobbyData.rooms[room]);
+      }
+     }, 1000);
+  });
   socket.on("rolStenen", (room) => {
     toggleActionBusy(lobbyData.rooms[room]);
     for (let i = 0; i < 5; i++) {
@@ -94,11 +102,46 @@ io.on("connection", socket => {
     io.to(room).emit("lobbyData", lobbyData.rooms[room]);
   });
   socket.on("joinRoom", ({username, room}) => {
-    const user = userJoin(socket.id, username, room);
+    const user = makeUser(socket.id, username, room);
     socket.join(user.room);
     
     if (lobbyData.rooms[room]) {
-      lobbyData.rooms[room].users.push(user);
+      console.log(lobbyData.rooms[room].gameData.users);
+      console.log(user);
+      
+      let exist = false;
+
+      if (lobbyData.rooms[room].users) {
+        lobbyData.rooms[room].users.forEach(player => {
+          if (player.username === user.username) {
+            if (player.admin) {
+              user.admin = true;
+              console.log(user);
+              
+            }
+            player = user;
+            exist = true
+            // io.to(room).emit("logData", lobbyData.rooms[room]);
+          }
+        })
+      }
+      if (lobbyData.rooms[room].gameData.users) {
+        lobbyData.rooms[room].gameData.users.forEach(player => {
+          if (player.username === user.username) {
+            if (player.admin) {
+              user.admin = true;
+            }
+            player = user;
+            exist = true
+            // io.to(room).emit("logData", lobbyData.rooms[room]);
+          }
+        })
+      }
+      if (!exist) {
+        console.log("no");
+        lobbyData.rooms[room].users.push(user);
+        // io.to(room).emit("logData", lobbyData.rooms[room]);
+      }
     } else {
       const party = createParty(user, room);
       lobbyData.rooms[room] = party;
@@ -114,6 +157,16 @@ io.on("connection", socket => {
     lobbyData.rooms[room].users = lobbyData.rooms[room].users.filter(userObj => {
       return userObj.username !== player
     })
+
+    if (player.admin) {
+      if (lobbyData.rooms[room].gameData.gameStarted) {
+        const i = Math.floor(Math.random() * lobbyData.rooms[room].gameData.users.length);
+        lobbyData.rooms[room].gameData.users[i].admin = true;
+      } else {
+        const i = Math.floor(Math.random() * lobbyData.rooms[room].users.length);
+        lobbyData.rooms[room].users[i].admin = true;
+      }
+    }
     // console.log(lobbyData.rooms[room].users);
     io.to(room).emit("lobbyData", lobbyData.rooms[room]);
   });
@@ -124,7 +177,8 @@ io.on("connection", socket => {
     toggleActionBusy(lobbyData.rooms[room]);
     chooseFirstPlayer(io, lobbyData.rooms[room], room);
     io.to(room).emit("lobbyData", lobbyData.rooms[room]);
-    setInterval(() => {
+
+    setInterval(() => {      
       io.to(room).emit("lobbyData", lobbyData.rooms[room]);
     }, 1000);
    });
@@ -446,7 +500,9 @@ io.on("connection", socket => {
           }
         }
       });
-      lobbyData.rooms[room].gameData.users[i].active = true;
+      if (lobbyData.rooms[room].gameData.users[i]) {
+        lobbyData.rooms[room].gameData.users[i].active = true;
+      }
     }
 
     io.to(room).emit("lobbyData", lobbyData.rooms[room]);
@@ -522,6 +578,16 @@ io.on("connection", socket => {
   socket.on("resetIfShootOut", (room) => {
     lobbyData.rooms[room].gameData.dupliqué.users = [];
     lobbyData.rooms[room].gameData.dupliqué.vanToepassing = false;
+    io.to(room).emit("lobbyData", lobbyData.rooms[room]);
+  });
+  socket.on("makeAdmin", (room) => {
+    if (lobbyData.rooms[room].gameData.gameStarted && lobbyData.rooms[room].gameData.users.length !== 0) {
+      const randy = Math.floor(Math.random() * lobbyData.rooms[room].gameData.users.length);
+      lobbyData.rooms[room].gameData.users[randy].admin = true;
+    } else if (lobbyData.rooms[room].users.length !== 0) {
+      const randy = Math.floor(Math.random() * lobbyData.rooms[room].users.length);
+      lobbyData.rooms[room].users[randy].admin = true;
+    }
     io.to(room).emit("lobbyData", lobbyData.rooms[room]);
   });
   // socket.on("", (room) => {

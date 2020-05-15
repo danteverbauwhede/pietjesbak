@@ -44,7 +44,7 @@
           <li
             v-on:click="this.startPB"
             class="button button--prim home__game-options__button"
-            v-bind:class="{ 'button--inactive': this.admin !== this.socket.id }"
+            v-bind:class="{ 'button--inactive': this.admin !== this.userName }"
           >
             Pietjesbakken
           </li>
@@ -56,8 +56,14 @@
         </ul>
       </div>
       <div class="partycode">
-        <p>Partycode:</p>
-        <p> {{ this.lobbyId }} </p>
+        <div>
+          <p>Partycode:</p>
+          <p> {{ this.lobbyId }} </p>
+        </div>
+        <div>
+          <p>Admin:</p>
+          <p> {{ this.admin }} </p>
+        </div>
       </div>
     </div>
   </div>
@@ -102,22 +108,44 @@ export default {
     this.socket.on("connect", () => {
       this.socket.emit("joinRoom", player);
     });
-    window.addEventListener(`beforeunload`, this.leaveLobby);
+    window.addEventListener(`beforeunload`, e => this.leaveLobby(e));
   },
   mounted() {
+    this.socket.emit("startPartey", this.$route.params.lobbyId);
+    
     this.socket.on("lobbyData", data => {
       this.lobbySpelers = data.users;
       this.gameData = data.gameData;
 
+      this.gameStarted = data.gameData.gameStarted;
+      this.gameEnded = data.gameData.gameEnded;
+
+      let adminAanw = false;
+      if (this.gameStarted) {
+        data.gameData.users.forEach(speler => {
+          if(speler.admin) {
+            adminAanw = true;
+          }
+        })
+      } else {
+        data.users.forEach(speler => {
+          if(speler.admin) {
+            adminAanw = true;
+          }
+        })
+      }
+
+      if (!adminAanw) {
+        this.socket.emit("makeAdmin", this.lobbyId);
+      }
+
       if (data.users) {
         data.users.forEach(user => {
           if (user.admin) {
-            this.admin = user.userId;
+            this.admin = user.username;
           }
         });
       }
-      this.gameStarted = data.gameData.gameStarted;
-      this.gameEnded = data.gameData.gameEnded;
     });
     this.socket.on("logData", poepie => {
       console.log(poepie);
@@ -127,12 +155,17 @@ export default {
     });
   },
   methods: {
-    startPB() {
-      if (this.admin === this.socket.id) {
+    startPB() {      
+      if (this.admin === this.userName) {
         this.socket.emit("startPb", this.lobbyId);
       }
     },
     leaveLobby() {
+      this.gameData.users.forEach(speler => {
+        if (speler.active && speler.username === this.userName) {
+          this.socket.emit("selectNextPlayer", this.lobbyId);
+        }
+      });
       const room = this.lobbyId;
       const player = this.userName;
       this.socket.emit('leaveLobby', {

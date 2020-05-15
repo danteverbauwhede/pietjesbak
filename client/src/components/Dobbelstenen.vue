@@ -54,7 +54,7 @@
       </div>
       <div
         id="max-worpen"
-        class="button button--sec button--inactive pietjesbak__stenen__gooi"
+        class="button button--inactive pietjesbak__stenen__gooi"
         v-if="
           (((this.maxAantalWorpen.waarde !== 0 &&
             this.rondeWorpen.waarde === this.maxAantalWorpen.waarde) ||
@@ -68,7 +68,7 @@
       </div>
       <div
         id="smijt"
-        class="button button--prim pietjesbak__stenen__gooi"
+        class="button button--sec pietjesbak__stenen__gooi"
         v-on:click="opnieuwGooien"
         v-if="
           this.maxAantalWorpen.waarde === 0 &&
